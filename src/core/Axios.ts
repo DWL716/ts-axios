@@ -1,6 +1,31 @@
-import { AxiosRequestConfig, AxiosPromise, Method } from '../types'
+import {
+  AxiosRequestConfig,
+  AxiosPromise,
+  Method,
+  AxiosResponse,
+  ResolvedFn,
+  RejectedFn
+} from '../types'
 import dispatchRequest from './dispatchRequest'
+import InterceptorManager from './InterceptorManager'
+
+interface Interceptors {
+  request: InterceptorManager<AxiosRequestConfig>
+  response: InterceptorManager<AxiosResponse>
+}
+interface PromiseChain<T> {
+  resolved: ResolvedFn<T> | ((config: AxiosRequestConfig) => AxiosPromise)
+  rejected?: RejectedFn
+}
 export default class Axios {
+  // 定义拦截器
+  interceptors: Interceptors
+  constructor() {
+    this.interceptors = {
+      request: new InterceptorManager<AxiosRequestConfig>(),
+      response: new InterceptorManager<AxiosResponse>()
+    }
+  }
   /* 不能进行重载的 request
   request(config: AxiosRequestConfig): AxiosPromise {
     return dispatchRequest(config)
@@ -16,7 +41,29 @@ export default class Axios {
     } else {
       config = url
     }
-    return dispatchRequest(config)
+
+    // 实现链式掉用拦截器
+    const chain: PromiseChain<any>[] = [
+      {
+        resolved: dispatchRequest,
+        rejected: undefined
+      }
+    ]
+
+    this.interceptors.request.forEach(interceptor => {
+      chain.unshift(interceptor)
+    })
+    this.interceptors.response.forEach(interceptor => {
+      chain.push(interceptor)
+    })
+
+    let promise = Promise.resolve(config)
+    while (chain.length) {
+      const { resolved, rejected } = chain.shift()!
+      promise = promise.then(resolved, rejected)
+    }
+
+    return promise
   }
   // 设置请求方法
   get(url: string, config?: AxiosRequestConfig): AxiosPromise {
