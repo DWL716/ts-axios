@@ -66,3 +66,19 @@ export interface AxiosInstance extends Axios {
   // 定义 {url, config} 实现函数重载（需要修改 Axios类中的 request方法）
   <T = any>(url: string, config?: AxiosRequestConfig): AxiosPromise<T>
 }
+
+// 定义拦截接口
+export interface AxiosInterceptorManager<T> {
+  // 定义拦截家的工具
+  use(resolved: ResolvedFn<T>, rejected: RejectedFn): number
+  // 定义拦截器的对应的 id
+  eject(id: number): void
+}
+
+export interface ResolvedFn<T> {
+  (val: T): T | Promise<T>
+}
+
+export interface RejectedFn {
+  (error: any): any
+}
