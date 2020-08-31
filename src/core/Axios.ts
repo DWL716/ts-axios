@@ -4,6 +4,7 @@ export default class Axios {
   request(config: AxiosRequestConfig): AxiosPromise {
     return dispatchRequest(config)
   }
+  // 设置请求方法
   get(url: string, config?: AxiosRequestConfig): AxiosPromise {
     return this._requestMethodWithoutData('get', url, config)
   }
@@ -28,7 +29,7 @@ export default class Axios {
   }
 
   // 抽取公共方法
-  _requestMethodWithoutData(
+  private _requestMethodWithoutData(
     method: Method,
     url: string,
     config?: AxiosRequestConfig
@@ -41,7 +42,7 @@ export default class Axios {
     )
   }
 
-  _requestMethodWithData(
+  private _requestMethodWithData(
     method: Method,
     url: string,
     data?: any,
