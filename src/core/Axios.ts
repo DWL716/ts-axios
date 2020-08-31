@@ -1,7 +1,21 @@
 import { AxiosRequestConfig, AxiosPromise, Method } from '../types'
 import dispatchRequest from './dispatchRequest'
 export default class Axios {
+  /* 不能进行重载的 request
   request(config: AxiosRequestConfig): AxiosPromise {
+    return dispatchRequest(config)
+  } */
+  // 可以进行重载的 request 方法
+  request(url: any, config?: any): AxiosPromise {
+    // 进行 url 判断
+    if (typeof url === 'string') {
+      if (!config) {
+        config = {}
+      }
+      config.url = url
+    } else {
+      config = url
+    }
     return dispatchRequest(config)
   }
   // 设置请求方法
