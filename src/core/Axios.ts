@@ -50,13 +50,16 @@ export default class Axios {
       }
     ]
 
+    // 向 chain 添加 请求拦截
     this.interceptors.request.forEach(interceptor => {
       chain.unshift(interceptor)
     })
+    // 向 chain 添加 响应拦截
     this.interceptors.response.forEach(interceptor => {
       chain.push(interceptor)
     })
 
+    // 实现 promise 链式调用 当请求拦截被执行完则开始发送请求
     let promise = Promise.resolve(config)
     while (chain.length) {
       const { resolved, rejected } = chain.shift()!
