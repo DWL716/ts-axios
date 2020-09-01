@@ -3,6 +3,7 @@ import xhr from './xhr'
 import { buildURL } from '../helpers/url'
 import { transformRequest, transformResponse } from '../helpers/data'
 import { processHeaders } from '../helpers/headers'
+import { flattenHeaders } from '../helpers/util'
 
 export default function dispatchRequest(config: AxiosRequestConfig): AxiosPromise {
   processConfig(config)
@@ -18,6 +19,7 @@ function processConfig(config: AxiosRequestConfig): void {
   config.headers = transformHeaders(config)
 
   config.data = transformData(config)
+  config.headers = flattenHeaders(config.headers, config.method!)
 }
 
 // 处理 url 请求拼接
