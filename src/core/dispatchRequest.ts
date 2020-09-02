@@ -7,6 +7,7 @@ import { flattenHeaders } from '../helpers/util'
 import transform from './transform'
 
 export default function dispatchRequest(config: AxiosRequestConfig): AxiosPromise {
+  throwIfCancellationRequested(config)
   processConfig(config)
   return xhr(config).then(res => {
     return transformResponseData(res)
@@ -47,4 +48,11 @@ function transformResponseData(res: AxiosResponse): AxiosResponse {
   // 配置响应的转换
   res.data = transform(res.data, res.headers, res.config.transformResponse)
   return res
+}
+
+// 判断发送请求
+function throwIfCancellationRequested(config: AxiosRequestConfig): void {
+  if (config.cancelToken) {
+    config.cancelToken.throwIfRequested()
+  }
 }
